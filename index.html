@@ -49,7 +49,7 @@
             <button onclick="toggleCart()" class="p-2 hover:bg-slate-100 rounded-full">✕</button>
         </div>
         
-        <!-- Konten yang bisa di-scroll (Daftar belanja + Form Informasi pelanggan) -->
+        <!-- Konten yang bisa di-scroll -->
         <div class="flex-1 overflow-y-auto p-6 space-y-6">
             <!-- Item Keranjang -->
             <div id="cart-items-container" class="space-y-3"></div>
@@ -68,12 +68,19 @@
                     <textarea id="cust-address" rows="2" placeholder="Nama Jalan, No. Rumah, RT/RW, Kecamatan" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-orange-500"></textarea>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">Metode Pembayaran *</label>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Metode Pembayaran (Transfer Bank) *</label>
                     <select id="cust-payment" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-orange-500">
-                        <option value="QRIS">QRIS (Otomatis / E-Wallet)</option>
                         <option value="Transfer Bank BCA">Transfer Bank BCA</option>
                         <option value="Transfer Bank Mandiri">Transfer Bank Mandiri</option>
                     </select>
+                </div>
+
+                <!-- Box Peringatan Wajib Bayar Dulu -->
+                <div class="bg-amber-50 border border-amber-200 p-4 rounded-2xl flex gap-3 items-start mt-2">
+                    <input type="checkbox" id="pay-first-agree" class="w-4 h-4 rounded mt-0.5 border-amber-400 text-orange-600 focus:ring-orange-500 cursor-pointer">
+                    <label for="pay-first-agree" class="text-xs text-slate-600 font-medium select-none cursor-pointer">
+                        Saya setuju bahwa pesanan ini <span class="text-orange-600 font-bold">Wajib Dibayar Terlebih Dahulu</span> melalui Transfer Bank sebelum masuk antrean gilingan dan pengiriman.
+                    </label>
                 </div>
             </div>
         </div>
@@ -85,7 +92,7 @@
                 <span id="cart-total" class="text-2xl font-black text-orange-600">Rp 0</span>
             </div>
             <button onclick="checkoutWhatsApp()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold hover:bg-orange-600 transition-all text-center block shadow-lg shadow-slate-900/10">
-                Kunci Pesanan & Bayar via WA
+                Kunci Pesanan & Ambil Rekening
             </button>
         </div>
     </div>
@@ -140,11 +147,9 @@
     <script>
         const SITE_DATA = {
             whatsapp: "6282111938330",
-            // Tambahkan data rekening bank / QRIS Anda di sini agar mudah dikelola
             paymentDetails: {
                 bca: "REK BCA: 1234567890 a/n UD ADI MIE",
-                mandiri: "REK MANDIRI: 9876543210 a/n UD ADI MIE",
-                qrisUrl: "https://link-ke-foto-qris-anda.com/qris.jpg" // Masukkan link gambar QRIS Anda
+                mandiri: "REK MANDIRI: 9876543210 a/n UD ADI MIE"
             },
             hero: {
                 title: "Mie Segar <br><span class='text-orange-500 italic'>Tanpa</span> Kimia.",
@@ -313,30 +318,33 @@
             }
         }
 
-        // FUNGSI UTAMA BARU: Mengumpulkan Detail Informasi Pengiriman & Instruksi Pembayaran Bank/QRIS
         function checkoutWhatsApp() {
             if(cart.length === 0) return alert("Keranjang belanja masih kosong!");
             
-            // Ambil input detail konsumen
             const name = document.getElementById('cust-name').value.trim();
             const address = document.getElementById('cust-address').value.trim();
             const paymentMethod = document.getElementById('cust-payment').value;
+            const isAgreed = document.getElementById('pay-first-agree').checked;
 
-            // Validasi data form wajib diisi
+            // Validasi kelengkapan form
             if(!name || !address) {
                 return alert("Mohon lengkapi Nama dan Alamat Pengiriman terlebih dahulu!");
             }
 
+            // BLOK VALIDASI: Harus setuju bayar duluan
+            if(!isAgreed) {
+                return alert("Anda harus menyetujui ketentuan 'Wajib Bayar Terlebih Dahulu' sebelum melakukan order!");
+            }
+
             let total = 0;
             
-            // 1. HEADER & DETAIL PELANGGAN
-            let msg = "*PESANAN BARU - UD. ADI MIE & PANGSIT*\n";
+            // Format Pesan Lebih Tegas
+            let msg = "*PESANAN BARU (WAJIB TRANSFER KEL Keluar)*\n";
             msg += "===================================\n\n";
             msg += `*Nama Pembeli:* ${name}\n`;
             msg += `*Alamat Kirim:* ${address}\n`;
-            msg += `*Opsi Bayar:* ${paymentMethod}\n\n`;
+            msg += `*Metode:* ${paymentMethod} (Bayar Duluan)\n\n`;
             
-            // 2. DETAIL DAFTAR PRODUK YANG DIPESAN
             msg += "*DAFTAR BELANJA:*\n";
             cart.forEach(i => {
                 const subtotal = i.price * i.qty;
@@ -348,19 +356,16 @@
             msg += `*TOTAL TAGIHAN:* Rp ${total.toLocaleString('id-ID')}\n`;
             msg += "-----------------------------------\n\n";
             
-            // 3. DETAIL METODE INSTRUKSI PEMBAYARAN BANK & QRIS
-            msg += "*INSTRUKSI PEMBAYARAN:*\n";
-            msg += "Silakan transfer tepat sesuai total tagihan di atas ke:\n";
+            msg += "*INSTRUKSI TRANSFER BANK:*\n";
+            msg += "Silakan langsung transfer penuh agar pesanan masuk slot produksi gilingan:\n";
             
             if (paymentMethod === "Transfer Bank BCA") {
                 msg += `👉 ${SITE_DATA.paymentDetails.bca}\n`;
-            } else if (paymentMethod === "Transfer Bank Mandiri") {
+            } else if (paymentMethod === "Transfer Bank BJB") {
                 msg += `👉 ${SITE_DATA.paymentDetails.mandiri}\n`;
-            } else if (paymentMethod === "QRIS") {
-                msg += `👉 Scan Kode QRIS Toko di sini: ${SITE_DATA.paymentDetails.qrisUrl}\n`;
             }
             
-            msg += "\n*PENTING:* Mohon lampirkan screenshoot Bukti Transfer di bawah chat ini untuk mempercepat proses pembuatan & pengiriman subuh. Terima kasih!";
+            msg += "\n⚠️ *PENTING:* Kirim foto bukti transfer setelah chat ini. Pesanan tanpa bukti bayar tidak akan diproduksi maupun dikirim subuh nanti. Terima kasih!";
 
             // Buka WhatsApp
             window.open(`https://wa.me/${SITE_DATA.whatsapp}?text=${encodeURIComponent(msg)}`);
