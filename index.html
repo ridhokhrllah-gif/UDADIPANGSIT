@@ -19,6 +19,7 @@
 </head>
 <body class="bg-[#FCFBFA] text-slate-900">
 
+    <!-- NAVIGASI / NAVBAR -->
     <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-5xl">
         <div class="glass border border-white/40 shadow-2xl shadow-black/5 rounded-3xl px-8 py-4 flex justify-between items-center">
             <div class="text-xl font-800 tracking-tighter text-orange-600 uppercase">
@@ -41,21 +42,55 @@
         </div>
     </nav>
 
-    <div id="cart-sidebar" class="fixed top-0 right-0 h-full w-full md:w-[400px] bg-white z-[60] shadow-2xl translate-x-full transition-transform duration-500 flex flex-col">
-        <div class="p-8 border-b flex justify-between items-center">
+    <!-- SIDEBAR KERANJANG & FORM DETAIL -->
+    <div id="cart-sidebar" class="fixed top-0 right-0 h-full w-full md:w-[450px] bg-white z-[60] shadow-2xl translate-x-full transition-transform duration-500 flex flex-col">
+        <div class="p-6 border-b flex justify-between items-center">
             <h2 class="text-2xl font-800 tracking-tight">Pesanan Anda</h2>
             <button onclick="toggleCart()" class="p-2 hover:bg-slate-100 rounded-full">✕</button>
         </div>
-        <div id="cart-items-container" class="flex-1 overflow-y-auto p-8 space-y-4"></div>
-        <div class="p-8 bg-slate-50 border-t">
-            <div class="flex justify-between items-center mb-6">
-                <span class="font-bold text-slate-400 text-xs tracking-widest uppercase">Total</span>
+        
+        <!-- Konten yang bisa di-scroll (Daftar belanja + Form Informasi pelanggan) -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-6">
+            <!-- Item Keranjang -->
+            <div id="cart-items-container" class="space-y-3"></div>
+            
+            <hr class="border-slate-100">
+
+            <!-- Form Detail Informasi Pembeli -->
+            <div class="space-y-4">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Detail Informasi & Pengiriman</h3>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Nama Lengkap *</label>
+                    <input type="text" id="cust-name" placeholder="Contoh: Budi Santoso" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-orange-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Alamat Pengiriman Lengkap *</label>
+                    <textarea id="cust-address" rows="2" placeholder="Nama Jalan, No. Rumah, RT/RW, Kecamatan" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-orange-500"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Metode Pembayaran *</label>
+                    <select id="cust-payment" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-orange-500">
+                        <option value="QRIS">QRIS (Otomatis / E-Wallet)</option>
+                        <option value="Transfer Bank BCA">Transfer Bank BCA</option>
+                        <option value="Transfer Bank Mandiri">Transfer Bank Mandiri</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bagian Bawah Bag Sticky -->
+        <div class="p-6 bg-slate-50 border-t">
+            <div class="flex justify-between items-center mb-4">
+                <span class="font-bold text-slate-400 text-xs tracking-widest uppercase">Total Tagihan</span>
                 <span id="cart-total" class="text-2xl font-black text-orange-600">Rp 0</span>
             </div>
-            <button onclick="checkoutWhatsApp()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold hover:bg-orange-600 transition-all">Checkout WA</button>
+            <button onclick="checkoutWhatsApp()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold hover:bg-orange-600 transition-all text-center block shadow-lg shadow-slate-900/10">
+                Kunci Pesanan & Bayar via WA
+            </button>
         </div>
     </div>
 
+    <!-- HERO SECTION -->
     <section class="min-h-screen flex items-center pt-24 px-6">
         <div class="container mx-auto grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -69,6 +104,7 @@
         </div>
     </section>
 
+    <!-- KATALOG PRODUK -->
     <section id="produk" class="py-32 bg-white">
         <div class="container mx-auto px-6">
             <div class="flex flex-col md:flex-row justify-between items-end mb-16">
@@ -82,6 +118,7 @@
         </div>
     </section>
 
+    <!-- KEMITRAAN -->
     <section id="kemitraan" class="py-32 bg-slate-50">
         <div class="container mx-auto px-6">
             <div class="text-center max-w-3xl mx-auto mb-16">
@@ -92,6 +129,7 @@
         </div>
     </section>
 
+    <!-- TESTIMONI -->
     <section id="testimoni" class="py-32 bg-white">
         <div class="container mx-auto px-6">
             <h2 class="font-display text-5xl text-center mb-16 text-slate-900">Kata <span class="text-orange-500 italic">Mereka</span></h2>
@@ -102,6 +140,12 @@
     <script>
         const SITE_DATA = {
             whatsapp: "6282111938330",
+            // Tambahkan data rekening bank / QRIS Anda di sini agar mudah dikelola
+            paymentDetails: {
+                bca: "REK BCA: 1234567890 a/n UD ADI MIE",
+                mandiri: "REK MANDIRI: 9876543210 a/n UD ADI MIE",
+                qrisUrl: "https://link-ke-foto-qris-anda.com/qris.jpg" // Masukkan link gambar QRIS Anda
+            },
             hero: {
                 title: "Mie Segar <br><span class='text-orange-500 italic'>Tanpa</span> Kimia.",
                 desc: "Supplier tangan pertama untuk kebutuhan Bakmi Ayam, Pangsit, dan Ramen. Produksi fresh setiap subuh.",
@@ -111,7 +155,6 @@
                 { name: "Kemitraan", link: "#kemitraan" },
                 { name: "Testimoni", link: "#testimoni" }
             ],
-            // 1. Diberikan properti 'image' untuk menyimpan link foto produk
             products: [
                 { 
                     id: 1, 
@@ -121,7 +164,7 @@
                     unit: "kg", 
                     colSpan: "md:col-span-8", 
                     bgClass: "bg-slate-50",
-                    image: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=500" // Gantilah dengan link foto mie Anda
+                    image: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=500"
                 },
                 { 
                     id: 2, 
@@ -131,7 +174,7 @@
                     unit: "kg", 
                     colSpan: "md:col-span-4", 
                     bgClass: "bg-slate-900 text-white",
-                    image: "https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?auto=format&fit=crop&q=80&w=500" // Gantilah dengan link foto kulit pangsit Anda
+                    image: "https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?auto=format&fit=crop&q=80&w=500"
                 }
             ],
             kemitraan: [
@@ -188,7 +231,6 @@
             `).join('');
         }
 
-        // 2. Fungsi render diperbarui agar mampu menampilkan foto produk di sisi kanan atas bento card
         function renderProducts(filter) {
             const grid = document.getElementById('product-grid');
             const filtered = filter === 'all' ? SITE_DATA.products : SITE_DATA.products.filter(p => p.category === filter);
@@ -247,6 +289,11 @@
                             <p class="font-bold text-sm text-slate-900">${item.name}</p>
                             <p class="text-xs text-slate-400">${item.qty} x Rp ${item.price.toLocaleString('id-ID')}</p>
                         </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="changeQty(${item.id}, -1)" class="w-7 h-7 bg-white rounded-full font-bold shadow text-sm active:scale-95">-</button>
+                            <span class="text-sm font-bold px-1">${item.qty}</span>
+                            <button onclick="changeQty(${item.id}, 1)" class="w-7 h-7 bg-white rounded-full font-bold shadow text-sm active:scale-95">+</button>
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -255,10 +302,67 @@
             totalLabel.innerText = `Rp ${total.toLocaleString('id-ID')}`;
         }
 
+        function changeQty(id, delta) {
+            const item = cart.find(i => i.id === id);
+            if (item) {
+                item.qty += delta;
+                if (item.qty <= 0) {
+                    cart = cart.filter(i => i.id !== id);
+                }
+                updateCartUI();
+            }
+        }
+
+        // FUNGSI UTAMA BARU: Mengumpulkan Detail Informasi Pengiriman & Instruksi Pembayaran Bank/QRIS
         function checkoutWhatsApp() {
-            if(cart.length === 0) return alert("Pilih mie dulu boss!");
-            let msg = "*PESANAN BARU - UD. ADI MIE & PANGSIT*\n\n";
-            cart.forEach(i => msg += `- ${i.name} (${i.qty} ${i.unit})\n`);
+            if(cart.length === 0) return alert("Keranjang belanja masih kosong!");
+            
+            // Ambil input detail konsumen
+            const name = document.getElementById('cust-name').value.trim();
+            const address = document.getElementById('cust-address').value.trim();
+            const paymentMethod = document.getElementById('cust-payment').value;
+
+            // Validasi data form wajib diisi
+            if(!name || !address) {
+                return alert("Mohon lengkapi Nama dan Alamat Pengiriman terlebih dahulu!");
+            }
+
+            let total = 0;
+            
+            // 1. HEADER & DETAIL PELANGGAN
+            let msg = "*PESANAN BARU - UD. ADI MIE & PANGSIT*\n";
+            msg += "===================================\n\n";
+            msg += `*Nama Pembeli:* ${name}\n`;
+            msg += `*Alamat Kirim:* ${address}\n`;
+            msg += `*Opsi Bayar:* ${paymentMethod}\n\n`;
+            
+            // 2. DETAIL DAFTAR PRODUK YANG DIPESAN
+            msg += "*DAFTAR BELANJA:*\n";
+            cart.forEach(i => {
+                const subtotal = i.price * i.qty;
+                total += subtotal;
+                msg += `- ${i.name} [ ${i.qty} ${i.unit} ] x Rp ${i.price.toLocaleString('id-ID')} = Rp ${subtotal.toLocaleString('id-ID')}\n`;
+            });
+            
+            msg += "\n-----------------------------------\n";
+            msg += `*TOTAL TAGIHAN:* Rp ${total.toLocaleString('id-ID')}\n`;
+            msg += "-----------------------------------\n\n";
+            
+            // 3. DETAIL METODE INSTRUKSI PEMBAYARAN BANK & QRIS
+            msg += "*INSTRUKSI PEMBAYARAN:*\n";
+            msg += "Silakan transfer tepat sesuai total tagihan di atas ke:\n";
+            
+            if (paymentMethod === "Transfer Bank BCA") {
+                msg += `👉 ${SITE_DATA.paymentDetails.bca}\n`;
+            } else if (paymentMethod === "Transfer Bank Mandiri") {
+                msg += `👉 ${SITE_DATA.paymentDetails.mandiri}\n`;
+            } else if (paymentMethod === "QRIS") {
+                msg += `👉 Scan Kode QRIS Toko di sini: ${SITE_DATA.paymentDetails.qrisUrl}\n`;
+            }
+            
+            msg += "\n*PENTING:* Mohon lampirkan screenshoot Bukti Transfer di bawah chat ini untuk mempercepat proses pembuatan & pengiriman subuh. Terima kasih!";
+
+            // Buka WhatsApp
             window.open(`https://wa.me/${SITE_DATA.whatsapp}?text=${encodeURIComponent(msg)}`);
         }
 
