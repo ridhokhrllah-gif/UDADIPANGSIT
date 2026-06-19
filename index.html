@@ -71,7 +71,7 @@
                     <label class="block text-xs font-bold text-slate-600 mb-1">Metode Pembayaran (Transfer Bank) *</label>
                     <select id="cust-payment" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-orange-500">
                         <option value="Transfer Bank BCA">Transfer Bank BCA</option>
-                        <option value="Transfer Bank Mandiri">Transfer Bank BJB</option>
+                        <option value="Transfer Bank BJB">Transfer Bank BJB</option>
                     </select>
                 </div>
 
@@ -91,7 +91,7 @@
                 <span class="font-bold text-slate-400 text-xs tracking-widest uppercase">Total Tagihan</span>
                 <span id="cart-total" class="text-2xl font-black text-orange-600">Rp 0</span>
             </div>
-            <button onclick="checkoutWhatsApp()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold hover:bg-orange-600 transition-all text-center block shadow-lg shadow-slate-900/10">
+            <button id="btn-checkout" onclick="checkoutWhatsApp()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold hover:bg-orange-600 transition-all text-center block shadow-lg shadow-slate-900/10">
                 Kunci Pesanan & Ambil Rekening
             </button>
         </div>
@@ -147,6 +147,8 @@
     <script>
         const SITE_DATA = {
             whatsapp: "6282111938330",
+            // BACKEND_API: Konfigurasi alamat server hosting backend Anda nanti
+            backendUrl: "https://api.udadipangsit.com/api/checkout", 
             paymentDetails: {
                 bca: "REK BCA: 7126030222 a/n RIDHO KHOIRULLAH",
                 mandiri: "REK BJB: 0128105018100 a/n RIDHO KHOIRULLAH"
@@ -318,7 +320,8 @@
             }
         }
 
-        function checkoutWhatsApp() {
+        // FUNGSI UTAMA: Diganti menjadi sistem hit API ke Payment Gateway Backend
+        async function checkoutWhatsApp() {
             if(cart.length === 0) return alert("Keranjang belanja masih kosong!");
             
             const name = document.getElementById('cust-name').value.trim();
@@ -326,49 +329,71 @@
             const paymentMethod = document.getElementById('cust-payment').value;
             const isAgreed = document.getElementById('pay-first-agree').checked;
 
-            // Validasi kelengkapan form
             if(!name || !address) {
                 return alert("Mohon lengkapi Nama dan Alamat Pengiriman terlebih dahulu!");
             }
 
-            // BLOK VALIDASI: Harus setuju bayar duluan
             if(!isAgreed) {
                 return alert("Anda harus menyetujui ketentuan 'Wajib Bayar Terlebih Dahulu' sebelum melakukan order!");
             }
 
             let total = 0;
-            
-            // Format Pesan Lebih Tegas
-            let msg = "*PESANAN BARU (WAJIB TRANSFER KEL Keluar)*\n";
-            msg += "===================================\n\n";
-            msg += `*Nama Pembeli:* ${name}\n`;
-            msg += `*Alamat Kirim:* ${address}\n`;
-            msg += `*Metode:* ${paymentMethod} (Bayar Duluan)\n\n`;
-            
-            msg += "*DAFTAR BELANJA:*\n";
-            cart.forEach(i => {
+            const items = cart.map(i => {
                 const subtotal = i.price * i.qty;
                 total += subtotal;
-                msg += `- ${i.name} [ ${i.qty} ${i.unit} ] x Rp ${i.price.toLocaleString('id-ID')} = Rp ${subtotal.toLocaleString('id-ID')}\n`;
+                return {
+                    id: i.id.toString(),
+                    price: i.price,
+                    quantity: i.qty,
+                    name: i.name
+                };
             });
-            
-            msg += "\n-----------------------------------\n";
-            msg += `*TOTAL TAGIHAN:* Rp ${total.toLocaleString('id-ID')}\n`;
-            msg += "-----------------------------------\n\n";
-            
-            msg += "*INSTRUKSI TRANSFER BANK:*\n";
-            msg += "Silakan langsung transfer penuh agar pesanan masuk slot produksi gilingan:\n";
-            
-            if (paymentMethod === "Transfer Bank BCA") {
-                msg += `👉 ${SITE_DATA.paymentDetails.bca}\n`;
-            } else if (paymentMethod === "Transfer Bank BJB") {
-                msg += `👉 ${SITE_DATA.paymentDetails.mandiri}\n`;
-            }
-            
-            msg += "\n⚠️ *PENTING:* Kirim foto bukti transfer setelah chat ini. Pesanan tanpa bukti bayar tidak akan diproduksi maupun dikirim subuh nanti. Terima kasih!";
 
-            // Buka WhatsApp
-            window.open(`https://wa.me/${SITE_DATA.whatsapp}?text=${encodeURIComponent(msg)}`);
+            // Ubah teks tombol untuk indikator memproses transaksi
+            const btnCheckout = document.getElementById('btn-checkout');
+            const originalText = btnCheckout.innerText;
+            btnCheckout.innerText = "Membuat Virtual Account...";
+            btnCheckout.disabled = true;
+
+            try {
+                // Mengirim permintaan pembuatan VA ke Server Backend Anda sendiri
+                const response = await fetch(SITE_DATA.backendUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        customer_name: name,
+                        customer_address: address,
+                        bank_choice: paymentMethod, 
+                        gross_amount: total,
+                        cart_items: items
+                    })
+                });
+
+                const result = await response.json();
+
+                if(result.success) {
+                    // Beritahu nomor Virtual Account yang berhasil didapatkan dari Midtrans
+                    alert(`NOMOR VIRTUAL ACCOUNT BERHASIL DIBUAT!\n\n` +
+                          `Silakan transfer ke VA ${result.bank.toUpperCase()}:\n` +
+                          `${result.va_number}\n\n` +
+                          `Total Tagihan: Rp ${total.toLocaleString('id-ID')}\n\n` +
+                          `Pesanan akan terkonfirmasi ke WhatsApp otomatis setelah Anda membayar.`);
+                    
+                    // Reset Keranjang Belanja setelah sukses
+                    cart = [];
+                    updateCartUI();
+                    toggleCart();
+                } else {
+                    alert("Gagal memproses metode pembayaran VA: " + result.message);
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Gagal terhubung ke server backend pengolah pembayaran.");
+            } finally {
+                // Kembalikan status tombol seperti semula
+                btnCheckout.innerText = originalText;
+                btnCheckout.disabled = false;
+            }
         }
 
         window.onload = initSite;
