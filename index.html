@@ -67,13 +67,14 @@
                     <label class="block text-xs font-bold text-slate-600 mb-1">Alamat Pengiriman Lengkap *</label>
                     <textarea id="cust-address" rows="2" placeholder="Nama Jalan, No. Rumah, RT/RW, Kecamatan" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-orange-500"></textarea>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">Metode Pembayaran (Transfer Bank) *</label>
+             <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Metode Pembayaran (Transfer VA) *</label>
                     <select id="cust-payment" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-orange-500">
-                        <option value="Transfer Bank BCA">Transfer Bank BCA</option>
-                        <option value="Transfer Bank BJB">Transfer Bank BJB</option>
-                    </select>
-                </div>
+                    <option value="bca">Transfer Virtual Account BCA</option>
+                    <option value="bni">Transfer Virtual Account BNI</option>
+                    <option value="bri">Transfer Virtual Account BRI</option>
+                     </select>
+              </div>
 
                 <!-- Box Peringatan Wajib Bayar Dulu -->
                 <div class="bg-amber-50 border border-amber-200 p-4 rounded-2xl flex gap-3 items-start mt-2">
