@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UD. ADI PANGSIT | Gilingan Mie & Pangsit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Playfair+Display:wght@900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .font-display { font-family: 'Playfair Display', serif; }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); }
+        .noodle-gradient { background: linear-gradient(135deg, #FFD93D 0%, #FF8400 100%); }
+        .bento-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .bento-card:hover { transform: translateY(-10px); }
+        .filter-active { background: white; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); color: #0f172a; }
+        .cart-open { transform: translateX(0) !important; }
+    </style>
+</head>
+<body class="bg-[#FCFBFA] text-slate-900">
+
+    <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-5xl">
+        <div class="glass border border-white/40 shadow-2xl shadow-black/5 rounded-3xl px-8 py-4 flex justify-between items-center">
+            <div class="text-xl font-800 tracking-tighter text-orange-600 uppercase">
+                UD. ADI
+                <div>
+                    <span class="text-slate-900 text-xs tracking-normal block -mt-1">MIE & PANGSIT</span>
+                </div>
+            </div>
+            
+            <div id="nav-links" class="hidden md:flex space-x-10 text-sm font-bold text-slate-600"></div>
+            
+            <div class="flex items-center gap-4">
+                <button onclick="toggleCart()" class="relative p-2 bg-slate-100 rounded-full hover:bg-orange-100 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                    <span id="cart-count-nav" class="absolute -top-1 -right-1 bg-orange-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">0</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div id="cart-sidebar" class="fixed top-0 right-0 h-full w-full md:w-[400px] bg-white z-[60] shadow-2xl translate-x-full transition-transform duration-500 flex flex-col">
+        <div class="p-8 border-b flex justify-between items-center">
+            <h2 class="text-2xl font-800 tracking-tight">Pesanan Anda</h2>
+            <button onclick="toggleCart()" class="p-2 hover:bg-slate-100 rounded-full">✕</button>
+        </div>
+        <div id="cart-items-container" class="flex-1 overflow-y-auto p-8 space-y-4"></div>
+        <div class="p-8 bg-slate-50 border-t">
+            <div class="flex justify-between items-center mb-6">
+                <span class="font-bold text-slate-400 text-xs tracking-widest uppercase">Total</span>
+                <span id="cart-total" class="text-2xl font-black text-orange-600">Rp 0</span>
+            </div>
+            <button onclick="checkoutWhatsApp()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold hover:bg-orange-600 transition-all">Checkout WA</button>
+        </div>
+    </div>
+
+    <section class="min-h-screen flex items-center pt-24 px-6">
+        <div class="container mx-auto grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <h1 id="hero-title" class="font-display text-5xl lg:text-8xl leading-[0.9] mb-8"></h1>
+                <p id="hero-desc" class="text-slate-500 text-lg max-w-lg mb-10"></p>
+                <a href="#produk" class="bg-orange-500 text-white px-10 py-5 rounded-3xl font-bold inline-block shadow-xl shadow-orange-100">Lihat Produk</a>
+            </div>
+            <div class="noodle-gradient aspect-square rounded-[60px] overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1585032226651-759b368d7246?auto=format&fit=crop&q=80&w=1000" class="w-full h-full object-cover mix-blend-overlay opacity-50">
+            </div>
+        </div>
+    </section>
+
+    <section id="produk" class="py-32 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-16">
+                <div>
+                    <h2 class="font-display text-5xl text-orange-500 mb-4">Katalog Produk</h2>
+                    <p class="text-slate-400">Pilihan mie artisanal terbaik untuk bisnis Anda.</p>
+                </div>
+                <div id="filter-container" class="flex bg-slate-100 p-1.5 rounded-2xl mt-8"></div>
+            </div>
+            <div id="product-grid" class="grid grid-cols-1 md:grid-cols-12 gap-6"></div>
+        </div>
+    </section>
+
+    <section id="kemitraan" class="py-32 bg-slate-50">
+        <div class="container mx-auto px-6">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="font-display text-5xl mb-6">Gabung Jadi <span class="text-orange-500">Mitra</span></h2>
+                <p class="text-slate-500">Dapatkan harga grosir khusus untuk supply resto, hotel, atau UMKM dengan kualitas konsisten setiap hari.</p>
+            </div>
+            <div id="kemitraan-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8"></div>
+        </div>
+    </section>
+
+    <section id="testimoni" class="py-32 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="font-display text-5xl text-center mb-16 text-slate-900">Kata <span class="text-orange-500 italic">Mereka</span></h2>
+            <div id="testimoni-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+        </div>
+    </section>
+
+    <script>
+        const SITE_DATA = {
+            whatsapp: "6282111938330",
+            hero: {
+                title: "Mie Segar <br><span class='text-orange-500 italic'>Tanpa</span> Kimia.",
+                desc: "Supplier tangan pertama untuk kebutuhan Bakmi Ayam, Pangsit, dan Ramen. Produksi fresh setiap subuh.",
+            },
+            nav: [
+                { name: "Produk", link: "#produk" },
+                { name: "Kemitraan", link: "#kemitraan" },
+                { name: "Testimoni", link: "#testimoni" }
+            ],
+            // 1. Diberikan properti 'image' untuk menyimpan link foto produk
+            products: [
+                { 
+                    id: 1, 
+                    category: "mie", 
+                    name: "Mie Basah Signature", 
+                    price: 17000, 
+                    unit: "kg", 
+                    colSpan: "md:col-span-8", 
+                    bgClass: "bg-slate-50",
+                    image: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=500" // Gantilah dengan link foto mie Anda
+                },
+                { 
+                    id: 2, 
+                    category: "kulit", 
+                    name: "Kulit Pangsit", 
+                    price: 14000, 
+                    unit: "kg", 
+                    colSpan: "md:col-span-4", 
+                    bgClass: "bg-slate-900 text-white",
+                    image: "https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?auto=format&fit=crop&q=80&w=500" // Gantilah dengan link foto kulit pangsit Anda
+                }
+            ],
+            kemitraan: [
+                { icon: "🏪", title: "Supply Warung", desc: "Minimal order 5kg/hari dengan harga kompetitif." },
+                { icon: "🏢", title: "Skala Resto", desc: "Custom ukuran dan tekstur mie sesuai resep brand Anda." },
+                { icon: "🚚", title: "Reseller", desc: "Kesempatan jadi distributor resmi di area Anda." }
+            ],
+            testimoni: [
+                { user: "Andi Bakmi", msg: "Tekstur mie sangat stabil, pelanggan saya makin ramai!", role: "Owner Bakmi Jakarta" },
+                { user: "Siska Ramen", msg: "Kulit pangsitnya tipis tapi nggak gampang sobek. Juara!", role: "Chef Resto" },
+                { user: "Budi Grosir", msg: "Pengiriman selalu tepat waktu jam 5 pagi sudah sampai.", role: "Supplier Pasar" }
+            ]
+        };
+
+        let cart = [];
+
+        function initSite() {
+            document.getElementById('hero-title').innerHTML = SITE_DATA.hero.title;
+            document.getElementById('hero-desc').innerText = SITE_DATA.hero.desc;
+
+            const navHtml = SITE_DATA.nav.map(item => 
+                `<a href="${item.link}" class="hover:text-orange-600 transition-all duration-300">${item.name}</a>`
+            ).join('');
+            document.getElementById('nav-links').innerHTML = navHtml;
+
+            document.getElementById('kemitraan-grid').innerHTML = SITE_DATA.kemitraan.map(k => `
+                <div class="bg-white p-10 rounded-[32px] border border-slate-100 hover:shadow-xl transition-all">
+                    <div class="text-4xl mb-6">${k.icon}</div>
+                    <h3 class="text-xl font-bold mb-4">${k.title}</h3>
+                    <p class="text-slate-500 text-sm leading-relaxed">${k.desc}</p>
+                </div>
+            `).join('');
+
+            document.getElementById('testimoni-grid').innerHTML = SITE_DATA.testimoni.map(t => `
+                <div class="bg-slate-50 p-8 rounded-[32px] border border-slate-100 italic">
+                    <p class="text-slate-700 mb-6">"${t.msg}"</p>
+                    <div class="not-italic">
+                        <p class="font-bold text-orange-600 text-sm">${t.user}</p>
+                        <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">${t.role}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            renderProducts('all');
+            renderFilters();
+        }
+
+        function renderFilters() {
+            const categories = ['all', 'mie', 'kulit'];
+            document.getElementById('filter-container').innerHTML = categories.map(cat => `
+                <button onclick="renderProducts('${cat}')" class="filter-btn px-6 py-2 rounded-xl text-sm font-bold uppercase transition-all duration-300 ${cat === 'all' ? 'filter-active' : 'text-slate-400'}">
+                    ${cat === 'all' ? 'Semua' : cat}
+                </button>
+            `).join('');
+        }
+
+        // 2. Fungsi render diperbarui agar mampu menampilkan foto produk di sisi kanan atas bento card
+        function renderProducts(filter) {
+            const grid = document.getElementById('product-grid');
+            const filtered = filter === 'all' ? SITE_DATA.products : SITE_DATA.products.filter(p => p.category === filter);
+            
+            grid.innerHTML = filtered.map(p => `
+                <div class="${p.colSpan} bento-card ${p.bgClass} rounded-[40px] p-10 flex flex-col justify-between border border-slate-100 min-h-[320px]">
+                    <div class="flex justify-between items-start gap-4">
+                        <div>
+                            <h3 class="text-3xl font-bold mb-2">${p.name}</h3>
+                            <p class="text-xl font-black opacity-80">Rp ${p.price.toLocaleString('id-ID')} / ${p.unit}</p>
+                        </div>
+                        ${p.image ? `<img src="${p.image}" class="w-24 h-24 object-cover rounded-2xl shadow-md flex-shrink-0" alt="${p.name}">` : ''}
+                    </div>
+                    <button onclick="addToCart(${p.id})" class="mt-8 self-start px-8 py-3 bg-white text-slate-900 rounded-2xl font-bold hover:bg-orange-100 transition-all shadow-lg active:scale-95">
+                        + Tambah Pesanan
+                    </button>
+                </div>
+            `).join('');
+
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if(btn.innerText.toLowerCase() === filter || (filter === 'all' && btn.innerText === 'SEMUA')) {
+                    btn.classList.add('filter-active');
+                    btn.classList.remove('text-slate-400');
+                } else {
+                    btn.classList.remove('filter-active');
+                    btn.classList.add('text-slate-400');
+                }
+            });
+        }
+
+        function toggleCart() {
+            document.getElementById('cart-sidebar').classList.toggle('cart-open');
+        }
+
+        function addToCart(id) {
+            const product = SITE_DATA.products.find(p => p.id === id);
+            const exist = cart.find(item => item.id === id);
+            if (exist) { exist.qty++; } else { cart.push({ ...product, qty: 1 }); }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cart-items-container');
+            const totalLabel = document.getElementById('cart-total');
+            const countNav = document.getElementById('cart-count-nav');
+            
+            let total = 0;
+            let count = 0;
+
+            container.innerHTML = cart.map(item => {
+                total += item.price * item.qty;
+                count += item.qty;
+                return `
+                    <div class="flex justify-between items-center bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                        <div>
+                            <p class="font-bold text-sm text-slate-900">${item.name}</p>
+                            <p class="text-xs text-slate-400">${item.qty} x Rp ${item.price.toLocaleString('id-ID')}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            countNav.innerText = count;
+            totalLabel.innerText = `Rp ${total.toLocaleString('id-ID')}`;
+        }
+
+        function checkoutWhatsApp() {
+            if(cart.length === 0) return alert("Pilih mie dulu boss!");
+            let msg = "*PESANAN BARU - UD. ADI MIE & PANGSIT*\n\n";
+            cart.forEach(i => msg += `- ${i.name} (${i.qty} ${i.unit})\n`);
+            window.open(`https://wa.me/${SITE_DATA.whatsapp}?text=${encodeURIComponent(msg)}`);
+        }
+
+        window.onload = initSite;
+    </script>
+</body>
+</html>
